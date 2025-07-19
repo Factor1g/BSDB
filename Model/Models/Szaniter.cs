@@ -5,7 +5,7 @@ namespace Model;
 
 public partial class Szaniter
 {
-    public int Azonosító { get; set; }
+    public int Id { get; set; }
 
     public string? Megnevezes { get; set; }
 
@@ -18,4 +18,12 @@ public partial class Szaniter
     public decimal? DijHuf { get; set; }
 
     public string? ProjektSzam { get; set; }
+
+    public string? Megjegyzes { get; set; }
+
+    public byte[] SsmaTimeStamp { get; set; } = null!;
+
+    public virtual Alvallalkozok? Alvallalkozo { get; set; }
+
+    public virtual Projektek? ProjektSzamNavigation { get; set; }
 }

@@ -6,16 +6,22 @@
         xmlns:local="clr-namespace:ServiceEquipment"
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="1200">
-    <Grid RenderTransformOrigin="0.474,0.543">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="287*"/>
-            <ColumnDefinition Width="113*"/>
-        </Grid.ColumnDefinitions>
+    <Grid Margin="20">
         <StackPanel>
-            <ComboBox x:Name="TableSelector" Width="200" Margin="0,0,0,10" SelectionChanged="TableSelector_SelectionChanged"/>
-            <TextBox x:Name="SearchBox" Width="200" Margin="0,0,0,10" KeyUp="SearchBox_KeyUp"/>
-            <DataGrid x:Name="DataGridView" AutoGenerateColumns="True" Height="400" Width="799" SelectionChanged="DataGridView_SelectionChanged"/>
-        </StackPanel>
+            <ComboBox x:Name="EntitySelector"
+                      Width="200"
+                      Margin="0,0,0,10"
+                      SelectionChanged="EntitySelector_SelectionChanged"/>
 
+            <TextBox x:Name="SearchBox"
+                     Width="200"
+                     Margin="0,0,0,10"
+                     
+                     KeyUp="SearchBox_KeyUp"/>
+
+            <DataGrid x:Name="EntityGrid"
+                      AutoGenerateColumns="True"
+                      Height="400"/>
+        </StackPanel>
     </Grid>
 </Window>

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Model;
 
-namespace ServiceEquipment.Models;
+namespace DataAccess;
 
+//dotnet ef dbcontext scaffold "Server=localhost\SQLEXPRESS;Database=ServiceEquipmentDB;Trusted_Connection=True;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer --project "F:\Egyeb\Programozas\C#\BSDB\DataAccess" --startup-project "F:\Egyeb\Programozas\C#\BSDB\ServiceEquipment" --output-dir ../Model/Models --namespace Model --context-dir ./DataAccess --context ServiceEquipmentDbContext --context-namespace DataAccess --force
 public partial class ServiceEquipmentDbContext : DbContext
 {
     public ServiceEquipmentDbContext()
@@ -17,13 +19,11 @@ public partial class ServiceEquipmentDbContext : DbContext
 
     public virtual DbSet<Alvallalkozok> Alvallalkozoks { get; set; }
 
-    public virtual DbSet<Belimo> Belimos { get; set; }
-
-    public virtual DbSet<Berendezesek> Berendezeseks { get; set; }
+    public virtual DbSet<Model.Belimo> Belimos { get; set; }
 
     public virtual DbSet<Csapadekviz> Csapadekvizs { get; set; }
 
-    public virtual DbSet<Csovezetekek> Csovezetekeks { get; set; }
+    public virtual DbSet<Model.Csovezetekek> Csovezetekeks { get; set; }
 
     public virtual DbSet<Kazanok> Kazanoks { get; set; }
 
@@ -67,7 +67,6 @@ public partial class ServiceEquipmentDbContext : DbContext
 
             entity.ToTable("Alvallalkozok");
 
-            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Nev)
                 .HasMaxLength(255)
                 .HasColumnName("nev");
@@ -78,9 +77,11 @@ public partial class ServiceEquipmentDbContext : DbContext
 
         modelBuilder.Entity<Belimo>(entity =>
         {
-            entity.HasKey(e => e.Azonosító).HasName("Belimo$PrimaryKey");
+            entity.HasKey(e => e.Id).HasName("Belimo$PrimaryKey");
 
             entity.ToTable("Belimo");
+
+            entity.HasIndex(e => e.ProjektSzam, "Belimo$Belimoprojekt_szam");
 
             entity.HasIndex(e => e.AlvallalkozoId, "Belimo$alvallalkozo_ID");
 
@@ -97,10 +98,10 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.Property(e => e.Datum)
                 .HasPrecision(0)
                 .HasColumnName("datum");
-            entity.Property(e => e.Leiras).HasColumnName("leiras");
             entity.Property(e => e.Megjegyzes)
                 .HasMaxLength(255)
                 .HasColumnName("megjegyzes");
+            entity.Property(e => e.Megnevezes).HasColumnName("megnevezes");
             entity.Property(e => e.ProjektSzam)
                 .HasMaxLength(255)
                 .HasColumnName("projekt_szam");
@@ -112,51 +113,15 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.HasOne(d => d.Alvallalkozo).WithMany(p => p.Belimos)
                 .HasForeignKey(d => d.AlvallalkozoId)
                 .HasConstraintName("Belimo$AlvallalkozokBelimo");
-        });
 
-        modelBuilder.Entity<Berendezesek>(entity =>
-        {
-            entity.HasKey(e => e.Azonosító).HasName("Berendezesek$PrimaryKey");
-
-            entity.ToTable("Berendezesek");
-
-            entity.HasIndex(e => e.AlvallalkozoId, "Berendezesek$alvallalkozo_ID");
-
-            entity.Property(e => e.AlvallalkozoId)
-                .HasDefaultValue(0)
-                .HasColumnName("alvallalkozo_ID");
-            entity.Property(e => e.AnyagHuf)
-                .HasDefaultValue(0m)
-                .HasColumnType("money")
-                .HasColumnName("anyag_HUF");
-            entity.Property(e => e.Berendezes)
-                .HasMaxLength(255)
-                .HasColumnName("berendezes");
-            entity.Property(e => e.Datum)
-                .HasPrecision(0)
-                .HasColumnName("datum");
-            entity.Property(e => e.DijHuf)
-                .HasDefaultValue(0m)
-                .HasColumnType("money")
-                .HasColumnName("dij_HUF");
-            entity.Property(e => e.Gyarto)
-                .HasMaxLength(255)
-                .HasColumnName("gyarto");
-            entity.Property(e => e.ProjektSzam)
-                .HasMaxLength(255)
-                .HasColumnName("projekt_szam");
-            entity.Property(e => e.Termek)
-                .HasMaxLength(255)
-                .HasColumnName("termek");
-
-            entity.HasOne(d => d.Alvallalkozo).WithMany(p => p.Berendezeseks)
-                .HasForeignKey(d => d.AlvallalkozoId)
-                .HasConstraintName("Berendezesek$AlvallalkozokBerendezesek");
+            entity.HasOne(d => d.ProjektSzamNavigation).WithMany(p => p.Belimos)
+                .HasForeignKey(d => d.ProjektSzam)
+                .HasConstraintName("Belimo$ProjektekBelimo");
         });
 
         modelBuilder.Entity<Csapadekviz>(entity =>
         {
-            entity.HasKey(e => e.Azonosító).HasName("Csapadekviz$PrimaryKey");
+            entity.HasKey(e => e.Id).HasName("Csapadekviz$PrimaryKey");
 
             entity.ToTable("Csapadekviz");
 
@@ -202,15 +167,16 @@ public partial class ServiceEquipmentDbContext : DbContext
 
         modelBuilder.Entity<Csovezetekek>(entity =>
         {
-            entity.HasKey(e => e.Azonosito).HasName("Csovezetekek$PrimaryKey");
+            entity.HasKey(e => e.Id).HasName("Csovezetekek$PrimaryKey");
 
             entity.ToTable("Csovezetekek");
+
+            entity.HasIndex(e => e.ProjektSzam, "Csovezetekek$Csovezetekekprojekt_szam");
 
             entity.HasIndex(e => e.AlvallalkozoId, "Csovezetekek$alvallalkozo_ID");
 
             entity.HasIndex(e => e.Idomokkal, "Csovezetekek$idomokkal");
 
-            entity.Property(e => e.Azonosito).HasColumnName("azonosito");
             entity.Property(e => e.AjanlatDatum)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(CONVERT([datetime],CONVERT([varchar],getdate(),(1)),(1)))")
@@ -270,11 +236,15 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.HasOne(d => d.Alvallalkozo).WithMany(p => p.Csovezetekeks)
                 .HasForeignKey(d => d.AlvallalkozoId)
                 .HasConstraintName("Csovezetekek$AlvallalkozokAcelcsovek");
+
+            entity.HasOne(d => d.ProjektSzamNavigation).WithMany(p => p.Csovezetekeks)
+                .HasForeignKey(d => d.ProjektSzam)
+                .HasConstraintName("Csovezetekek$ProjektekCsovezetekek");
         });
 
         modelBuilder.Entity<Kazanok>(entity =>
         {
-            entity.HasKey(e => e.Azonosító).HasName("Kazanok$PrimaryKey");
+            entity.HasKey(e => e.Id).HasName("Kazanok$PrimaryKey");
 
             entity.ToTable("Kazanok");
 
@@ -309,6 +279,14 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.Property(e => e.Tipus)
                 .HasMaxLength(255)
                 .HasColumnName("tipus");
+
+            entity.HasOne(d => d.Alvallalkozo).WithMany(p => p.Kazanoks)
+                .HasForeignKey(d => d.AlvallalkozoId)
+                .HasConstraintName("FK_Kazanok_Alvallalkozok");
+
+            entity.HasOne(d => d.ProjektSzamNavigation).WithMany(p => p.Kazanoks)
+                .HasForeignKey(d => d.ProjektSzam)
+                .HasConstraintName("FK_Kazanok_Projektek");
         });
 
         modelBuilder.Entity<Kontaktok>(entity =>
@@ -319,10 +297,12 @@ public partial class ServiceEquipmentDbContext : DbContext
 
             entity.HasIndex(e => e.Telefonszam, "Kontaktok$Mobiltelefonszám");
 
+            entity.HasIndex(e => e.AlvallakozoId, "Kontaktok$alvallakozo_ID");
+
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Alvallakozo)
+            entity.Property(e => e.AlvallakozoId)
                 .HasDefaultValue(0)
-                .HasColumnName("alvallakozo");
+                .HasColumnName("alvallakozo_ID");
             entity.Property(e => e.Email)
                 .HasMaxLength(255)
                 .HasColumnName("email");
@@ -333,14 +313,14 @@ public partial class ServiceEquipmentDbContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("telefonszam");
 
-            entity.HasOne(d => d.AlvallakozoNavigation).WithMany(p => p.Kontaktoks)
-                .HasForeignKey(d => d.Alvallakozo)
+            entity.HasOne(d => d.Alvallakozo).WithMany(p => p.Kontaktoks)
+                .HasForeignKey(d => d.AlvallakozoId)
                 .HasConstraintName("Kontaktok$AlvallalkozokKontaktok");
         });
 
         modelBuilder.Entity<Legcsatornak>(entity =>
         {
-            entity.HasKey(e => e.Azonosító).HasName("Legcsatornak$PrimaryKey");
+            entity.HasKey(e => e.Id).HasName("Legcsatornak$PrimaryKey");
 
             entity.ToTable("legcsatornak");
 
@@ -385,11 +365,15 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.HasOne(d => d.Alvallalkozo).WithMany(p => p.Legcsatornaks)
                 .HasForeignKey(d => d.AlvallalkozoId)
                 .HasConstraintName("Legcsatornak$AlvallalkozokLegcsatornak");
+
+            entity.HasOne(d => d.ProjektSzamNavigation).WithMany(p => p.Legcsatornaks)
+                .HasForeignKey(d => d.ProjektSzam)
+                .HasConstraintName("Legcsatornak$ProjektekLegcsatornak");
         });
 
         modelBuilder.Entity<OsztokGyujtok>(entity =>
         {
-            entity.HasKey(e => e.Azonosító).HasName("Osztok_gyujtok$PrimaryKey");
+            entity.HasKey(e => e.Id).HasName("Osztok_gyujtok$PrimaryKey");
 
             entity.ToTable("Osztok_gyujtok");
 
@@ -424,6 +408,14 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.Property(e => e.ProjektSzam)
                 .HasMaxLength(255)
                 .HasColumnName("projekt_szam");
+
+            entity.HasOne(d => d.Alvallalkozo).WithMany(p => p.OsztokGyujtoks)
+                .HasForeignKey(d => d.AlvallalkozoId)
+                .HasConstraintName("FK_Osztok_gyujtok_Alvallalkozok");
+
+            entity.HasOne(d => d.ProjektSzamNavigation).WithMany(p => p.OsztokGyujtoks)
+                .HasForeignKey(d => d.ProjektSzam)
+                .HasConstraintName("FK_Osztok_gyujtok_Projektek");
         });
 
         modelBuilder.Entity<Projektek>(entity =>
@@ -451,9 +443,11 @@ public partial class ServiceEquipmentDbContext : DbContext
 
         modelBuilder.Entity<SplitKlimak>(entity =>
         {
-            entity.HasKey(e => e.Azonosító).HasName("Split_klimak$PrimaryKey");
+            entity.HasKey(e => e.Id).HasName("Split_klimak$PrimaryKey");
 
             entity.ToTable("Split_klimak");
+
+            entity.HasIndex(e => e.ProjektSzam, "Split_klimak$Split_klimakprojekt_szam");
 
             entity.HasIndex(e => e.AlvallalkozoId, "Split_klimak$alvallalkozo_ID");
 
@@ -474,9 +468,16 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.Property(e => e.Datum)
                 .HasPrecision(0)
                 .HasColumnName("datum");
+            entity.Property(e => e.DijHuf)
+                .HasDefaultValue(0m)
+                .HasColumnType("money")
+                .HasColumnName("dij_HUF");
             entity.Property(e => e.Gyarto)
                 .HasMaxLength(255)
                 .HasColumnName("gyarto");
+            entity.Property(e => e.Megjegyzes)
+                .HasMaxLength(255)
+                .HasColumnName("megjegyzes");
             entity.Property(e => e.Megnevezes)
                 .HasMaxLength(255)
                 .HasColumnName("megnevezes");
@@ -494,11 +495,15 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.HasOne(d => d.Alvallalkozo).WithMany(p => p.SplitKlimaks)
                 .HasForeignKey(d => d.AlvallalkozoId)
                 .HasConstraintName("Split_klimak$AlvallalkozokSplit_klimak");
+
+            entity.HasOne(d => d.ProjektSzamNavigation).WithMany(p => p.SplitKlimaks)
+                .HasForeignKey(d => d.ProjektSzam)
+                .HasConstraintName("Split_klimak$ProjektekSplit_klimak");
         });
 
         modelBuilder.Entity<Szaniter>(entity =>
         {
-            entity.HasKey(e => e.Azonosító).HasName("Szaniter$PrimaryKey");
+            entity.HasKey(e => e.Id).HasName("Szaniter$PrimaryKey");
 
             entity.ToTable("Szaniter");
 
@@ -518,17 +523,30 @@ public partial class ServiceEquipmentDbContext : DbContext
                 .HasDefaultValue(0m)
                 .HasColumnType("money")
                 .HasColumnName("dij_HUF");
+            entity.Property(e => e.Megjegyzes).HasColumnName("megjegyzes");
             entity.Property(e => e.Megnevezes)
                 .HasMaxLength(255)
                 .HasColumnName("megnevezes");
             entity.Property(e => e.ProjektSzam)
                 .HasMaxLength(255)
                 .HasColumnName("projekt_szam");
+            entity.Property(e => e.SsmaTimeStamp)
+                .IsRowVersion()
+                .IsConcurrencyToken()
+                .HasColumnName("SSMA_TimeStamp");
+
+            entity.HasOne(d => d.Alvallalkozo).WithMany(p => p.Szaniters)
+                .HasForeignKey(d => d.AlvallalkozoId)
+                .HasConstraintName("FK_Szaniter_Alvallalkozok");
+
+            entity.HasOne(d => d.ProjektSzamNavigation).WithMany(p => p.Szaniters)
+                .HasForeignKey(d => d.ProjektSzam)
+                .HasConstraintName("FK_Szaniter_Projektek");
         });
 
         modelBuilder.Entity<Szerelvenyek>(entity =>
         {
-            entity.HasKey(e => e.Azonosító).HasName("Szerelvenyek$PrimaryKey");
+            entity.HasKey(e => e.Id).HasName("Szerelvenyek$PrimaryKey");
 
             entity.ToTable("Szerelvenyek");
 
@@ -580,11 +598,17 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.HasOne(d => d.Alvallalkozo).WithMany(p => p.Szerelvenyeks)
                 .HasForeignKey(d => d.AlvallalkozoId)
                 .HasConstraintName("Szerelvenyek$AlvallalkozokSzelepek");
+
+            entity.HasOne(d => d.ProjektSzamNavigation).WithMany(p => p.Szerelvenyeks)
+                .HasForeignKey(d => d.ProjektSzam)
+                .HasConstraintName("FK_Szerelvenyek_Projektek");
         });
 
         modelBuilder.Entity<Szigetele>(entity =>
         {
-            entity.HasKey(e => e.Azonosító).HasName("Szigeteles$PrimaryKey");
+            entity.HasKey(e => e.Id).HasName("Szigeteles$PrimaryKey");
+
+            entity.HasIndex(e => e.ProjektSzam, "Szigeteles$Szigetelesprojekt_szam");
 
             entity.HasIndex(e => e.AlvallalkozoId, "Szigeteles$alvallalkozo_ID");
 
@@ -614,7 +638,9 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.Property(e => e.KulsoAtmero)
                 .HasDefaultValue(0)
                 .HasColumnName("kulso_atmero");
-            entity.Property(e => e.Mező1).HasMaxLength(255);
+            entity.Property(e => e.Megnevezes)
+                .HasMaxLength(255)
+                .HasColumnName("megnevezes");
             entity.Property(e => e.ProjektSzam)
                 .HasMaxLength(255)
                 .HasColumnName("projekt_szam");
@@ -629,13 +655,19 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.HasOne(d => d.Alvallalkozo).WithMany(p => p.Szigeteles)
                 .HasForeignKey(d => d.AlvallalkozoId)
                 .HasConstraintName("Szigeteles$AlvallalkozokSzigeteles");
+
+            entity.HasOne(d => d.ProjektSzamNavigation).WithMany(p => p.Szigeteles)
+                .HasForeignKey(d => d.ProjektSzam)
+                .HasConstraintName("Szigeteles$ProjektekSzigeteles");
         });
 
         modelBuilder.Entity<Szivattyuk>(entity =>
         {
-            entity.HasKey(e => e.Azonosító).HasName("Szivattyuk$PrimaryKey");
+            entity.HasKey(e => e.Id).HasName("Szivattyuk$PrimaryKey");
 
             entity.ToTable("Szivattyuk");
+
+            entity.HasIndex(e => e.ProjektSzam, "Szivattyuk$Szivattyukprojekt_szam");
 
             entity.HasIndex(e => e.AlvallalkozoId, "Szivattyuk$alvallalkozo_ID");
 
@@ -662,6 +694,9 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.Property(e => e.Megjegyzes)
                 .HasMaxLength(255)
                 .HasColumnName("megjegyzes");
+            entity.Property(e => e.Megnevezes)
+                .HasMaxLength(255)
+                .HasColumnName("megnevezes");
             entity.Property(e => e.NyomasBar)
                 .HasDefaultValue(0f)
                 .HasColumnName("nyomas_bar");
@@ -681,20 +716,23 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.Property(e => e.TerfogataramM3h)
                 .HasDefaultValue(0f)
                 .HasColumnName("terfogataram_m3h");
-            entity.Property(e => e.Tipus)
-                .HasMaxLength(255)
-                .HasColumnName("tipus");
 
             entity.HasOne(d => d.Alvallalkozo).WithMany(p => p.Szivattyuks)
                 .HasForeignKey(d => d.AlvallalkozoId)
                 .HasConstraintName("Szivattyuk$AlvallalkozokSzivattyuk");
+
+            entity.HasOne(d => d.ProjektSzamNavigation).WithMany(p => p.Szivattyuks)
+                .HasForeignKey(d => d.ProjektSzam)
+                .HasConstraintName("Szivattyuk$ProjektekSzivattyuk");
         });
 
         modelBuilder.Entity<Szolgaltatasok>(entity =>
         {
-            entity.HasKey(e => e.Azonosító).HasName("Szolgaltatasok$PrimaryKey");
+            entity.HasKey(e => e.Id).HasName("Szolgaltatasok$PrimaryKey");
 
             entity.ToTable("Szolgaltatasok");
+
+            entity.HasIndex(e => e.ProjektSzam, "Szolgaltatasok$Szolgaltatasokprojekt_szam");
 
             entity.HasIndex(e => e.AlvallalkozoId, "Szolgaltatasok$alvallalkozo_ID");
 
@@ -725,13 +763,19 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.HasOne(d => d.Alvallalkozo).WithMany(p => p.Szolgaltatasoks)
                 .HasForeignKey(d => d.AlvallalkozoId)
                 .HasConstraintName("Szolgaltatasok$AlvallalkozokSzolgaltatasok");
+
+            entity.HasOne(d => d.ProjektSzamNavigation).WithMany(p => p.Szolgaltatasoks)
+                .HasForeignKey(d => d.ProjektSzam)
+                .HasConstraintName("Szolgaltatasok$ProjektekSzolgaltatasok");
         });
 
         modelBuilder.Entity<TagulasiTartly>(entity =>
         {
-            entity.HasKey(e => e.Azonosító).HasName("Tagulasi_tartly$PrimaryKey");
+            entity.HasKey(e => e.Id).HasName("Tagulasi_tartly$PrimaryKey");
 
             entity.ToTable("Tagulasi_tartly");
+
+            entity.HasIndex(e => e.ProjektSzam, "Tagulasi_tartly$Tagulasi_tartlyprojekt_szam");
 
             entity.HasIndex(e => e.AlvallalkozoId, "Tagulasi_tartly$alvallalkozo_ID");
 
@@ -771,11 +815,15 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.HasOne(d => d.Alvallalkozo).WithMany(p => p.TagulasiTartlies)
                 .HasForeignKey(d => d.AlvallalkozoId)
                 .HasConstraintName("Tagulasi_tartly$AlvallalkozokTagulasi_tartly");
+
+            entity.HasOne(d => d.ProjektSzamNavigation).WithMany(p => p.TagulasiTartlies)
+                .HasForeignKey(d => d.ProjektSzam)
+                .HasConstraintName("Tagulasi_tartly$ProjektekTagulasi_tartly");
         });
 
         modelBuilder.Entity<TarolokPufferek>(entity =>
         {
-            entity.HasKey(e => e.Azonosito).HasName("Tarolok_pufferek$PrimaryKey");
+            entity.HasKey(e => e.Id).HasName("Tarolok_pufferek$PrimaryKey");
 
             entity.ToTable("Tarolok_pufferek");
 
@@ -817,6 +865,14 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.Property(e => e.UrtartalomL)
                 .HasDefaultValue(0f)
                 .HasColumnName("urtartalom_l");
+
+            entity.HasOne(d => d.Alvallalkozo).WithMany(p => p.TarolokPuffereks)
+                .HasForeignKey(d => d.AlvallalkozoId)
+                .HasConstraintName("FK_Tarolok_pufferek_Alvallalkozok");
+
+            entity.HasOne(d => d.ProjektSzamNavigation).WithMany(p => p.TarolokPuffereks)
+                .HasForeignKey(d => d.ProjektSzam)
+                .HasConstraintName("FK_Tarolok_pufferek_Projektek");
         });
 
         modelBuilder.Entity<Tmpclp440161>(entity =>
@@ -830,9 +886,11 @@ public partial class ServiceEquipmentDbContext : DbContext
 
         modelBuilder.Entity<Vizlagyitok>(entity =>
         {
-            entity.HasKey(e => e.Azonosító).HasName("Vizlagyitok$PrimaryKey");
+            entity.HasKey(e => e.Id).HasName("Vizlagyitok$PrimaryKey");
 
             entity.ToTable("Vizlagyitok");
+
+            entity.HasIndex(e => e.ProjektSzam, "Vizlagyitok$Vizlagyitokprojekt_szam");
 
             entity.HasIndex(e => e.AlvallalkozoId, "Vizlagyitok$alvallalkozo_ID");
 
@@ -873,6 +931,10 @@ public partial class ServiceEquipmentDbContext : DbContext
             entity.HasOne(d => d.Alvallalkozo).WithMany(p => p.Vizlagyitoks)
                 .HasForeignKey(d => d.AlvallalkozoId)
                 .HasConstraintName("Vizlagyitok$AlvallalkozokVizlagyitok");
+
+            entity.HasOne(d => d.ProjektSzamNavigation).WithMany(p => p.Vizlagyitoks)
+                .HasForeignKey(d => d.ProjektSzam)
+                .HasConstraintName("Vizlagyitok$ProjektekVizlagyitok");
         });
 
         OnModelCreatingPartial(modelBuilder);

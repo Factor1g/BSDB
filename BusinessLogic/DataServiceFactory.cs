@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using System.Windows;
 
 namespace BusinessLogic
 {
@@ -18,8 +19,12 @@ namespace BusinessLogic
 
         public object GetServiceForType(Type entityType)
         {
-            var genericType = typeof(GenericDataService<>).MakeGenericType(entityType);
-            return _serviceProvider.GetService(genericType);
+            //throw new InvalidOperationException($"Could not find service for type: {entityType.FullName}");
+            var serviceType = typeof(IGenericDataService<>).MakeGenericType(entityType);
+
+            var service = _serviceProvider.GetService(serviceType);
+            Console.WriteLine("Looking for: " + serviceType.FullName);
+            return service;
         }
     }
 }

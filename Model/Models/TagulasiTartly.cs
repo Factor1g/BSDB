@@ -5,7 +5,7 @@ namespace Model;
 
 public partial class TagulasiTartly
 {
-    public int Azonosító { get; set; }
+    public int Id { get; set; }
 
     public string? Megnevezes { get; set; }
 
@@ -28,4 +28,6 @@ public partial class TagulasiTartly
     public string? ProjektSzam { get; set; }
 
     public virtual Alvallalkozok? Alvallalkozo { get; set; }
+
+    public virtual Projektek? ProjektSzamNavigation { get; set; }
 }

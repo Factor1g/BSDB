@@ -2,7 +2,7 @@
 using Model;
 namespace BusinessLogic
 {
-    public class GenericDataService<T> where T : class, IEntity
+    public class GenericDataService<T> : IGenericDataService<T> where T : class, IEntity
     {
         protected readonly IBaseRepository<T> _repository;
 
@@ -21,10 +21,10 @@ namespace BusinessLogic
             return _repository.GetAll().FirstOrDefault(e => e.Id == id);
         }
 
-        public IQueryable<T> SearchByMegnevezes(string search)
+        public IQueryable<T> SearchByName(string search)
         {
             return _repository.GetAll()
-                .Where(e => e.Name.ToLower().Contains(search.ToLower()));
+                .Where(e => e.Megnevezes.ToLower().Contains(search.ToLower()));
         }
 
         public IQueryable<T> FilterByDateRange(DateTime start, DateTime end)

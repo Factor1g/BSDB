@@ -5,9 +5,9 @@ namespace Model;
 
 public partial class Szivattyuk
 {
-    public int Azonosító { get; set; }
+    public int Id { get; set; }
 
-    public string? Tipus { get; set; }
+    public string? Megnevezes { get; set; }
 
     public string? Cikkszam { get; set; }
 
@@ -36,4 +36,6 @@ public partial class Szivattyuk
     public byte[] SsmaTimeStamp { get; set; } = null!;
 
     public virtual Alvallalkozok? Alvallalkozo { get; set; }
+
+    public virtual Projektek? ProjektSzamNavigation { get; set; }
 }

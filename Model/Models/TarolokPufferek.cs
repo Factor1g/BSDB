@@ -5,7 +5,7 @@ namespace Model;
 
 public partial class TarolokPufferek
 {
-    public int Azonosito { get; set; }
+    public int Id { get; set; }
 
     public string? Megnevezes { get; set; }
 
@@ -28,4 +28,8 @@ public partial class TarolokPufferek
     public string? ProjektSzam { get; set; }
 
     public byte[] SsmaTimeStamp { get; set; } = null!;
+
+    public virtual Alvallalkozok? Alvallalkozo { get; set; }
+
+    public virtual Projektek? ProjektSzamNavigation { get; set; }
 }

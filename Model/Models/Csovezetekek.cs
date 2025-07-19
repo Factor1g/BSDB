@@ -5,7 +5,7 @@ namespace Model;
 
 public partial class Csovezetekek
 {
-    public int Azonosito { get; set; }
+    public int Id { get; set; }
 
     public string? Varrat { get; set; }
 
@@ -42,4 +42,6 @@ public partial class Csovezetekek
     public byte[] SsmaTimeStamp { get; set; } = null!;
 
     public virtual Alvallalkozok? Alvallalkozo { get; set; }
+
+    public virtual Projektek? ProjektSzamNavigation { get; set; }
 }

@@ -5,7 +5,7 @@ namespace Model;
 
 public partial class OsztokGyujtok
 {
-    public int Azonosító { get; set; }
+    public int Id { get; set; }
 
     public string? Megnevezes { get; set; }
 
@@ -24,4 +24,8 @@ public partial class OsztokGyujtok
     public string? Megjegyzes { get; set; }
 
     public int? AlvallalkozoId { get; set; }
+
+    public virtual Alvallalkozok? Alvallalkozo { get; set; }
+
+    public virtual Projektek? ProjektSzamNavigation { get; set; }
 }

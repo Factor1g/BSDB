@@ -5,13 +5,13 @@ namespace Model;
 
 public partial class Belimo
 {
-    public int Azonosító { get; set; }
+    public int Id { get; set; }
 
     public string? Cikkszam { get; set; }
 
     public decimal? AnyagEur { get; set; }
 
-    public string? Leiras { get; set; }
+    public string? Megnevezes { get; set; }
 
     public int? AlvallalkozoId { get; set; }
 
@@ -24,4 +24,6 @@ public partial class Belimo
     public byte[] SsmaTimeStamp { get; set; } = null!;
 
     public virtual Alvallalkozok? Alvallalkozo { get; set; }
+
+    public virtual Projektek? ProjektSzamNavigation { get; set; }
 }

@@ -5,7 +5,7 @@ namespace Model;
 
 public partial class SplitKlimak
 {
-    public int Azonosító { get; set; }
+    public int Id { get; set; }
 
     public string? Gyarto { get; set; }
 
@@ -25,7 +25,13 @@ public partial class SplitKlimak
 
     public string? ProjektSzam { get; set; }
 
+    public decimal? DijHuf { get; set; }
+
+    public string? Megjegyzes { get; set; }
+
     public byte[] SsmaTimeStamp { get; set; } = null!;
 
     public virtual Alvallalkozok? Alvallalkozo { get; set; }
+
+    public virtual Projektek? ProjektSzamNavigation { get; set; }
 }

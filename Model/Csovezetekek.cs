@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Model
 {
-    public partial class Csovezetekek : IEntity
+    public partial class Csovezetekek 
     {
-        public int Id { get => this.Azonosito; }
+        
         public string Name { get => this.Dn.ToString(); }
         public DateTime? Date { get => this.AjanlatDatum; }        
     }

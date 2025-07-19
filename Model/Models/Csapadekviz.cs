@@ -5,7 +5,7 @@ namespace Model;
 
 public partial class Csapadekviz
 {
-    public int Azonosító { get; set; }
+    public int Id { get; set; }
 
     public string? Megnevezes { get; set; }
 

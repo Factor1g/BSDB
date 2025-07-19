@@ -4,6 +4,8 @@ using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using DataAccess;
 using BusinessLogic;
+using Microsoft.EntityFrameworkCore;
+using Model;
 
 
 namespace ServiceEquipment
@@ -13,25 +15,34 @@ namespace ServiceEquipment
     /// </summary>
     public partial class App : Application
     {
-        public static ServiceProvider ServiceProvider { get; private set; }
+        private ServiceProvider _serviceProvider;
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            var services = new ServiceCollection();
-
-            services.AddDbContext<ServiceEquipmentDbContext>();
-            services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-            services.AddScoped(typeof(GenericDataService<>));
-            services.AddSingleton<IDataServiceFactory, DataServiceFactory>();
-            services.AddSingleton<MainWindow>();
-            ServiceProvider = services.BuildServiceProvider();
-
-            var mainWindow = ServiceProvider.GetService<MainWindow>();
-            mainWindow.Show();
-
             base.OnStartup(e);
 
+            var services = new ServiceCollection();
+            ConfigureServices(services);
 
+            _serviceProvider = services.BuildServiceProvider();
+
+            var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+            mainWindow.Show();
+        }
+
+        private void ConfigureServices(IServiceCollection services)
+        {
+            // Register your services here
+            services.AddDbContext<ServiceEquipmentDbContext>(options =>
+                options.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=ServiceEquipmentDB;Trusted_Connection=True;TrustServerCertificate=True;"));
+            services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            services.AddScoped(typeof(IGenericDataService<>), typeof(GenericDataService<>));
+            services.AddSingleton<IDataServiceFactory, DataServiceFactory>();
+            services.AddScoped<IGenericDataService<Model.Belimo>, GenericDataService<Model.Belimo>>();
+            //services.AddScoped<IGenericDataService<Model.Csovezetekek>, GenericDataService<Model.Csovezetekek>>();
+
+
+            services.AddSingleton<MainWindow>();
         }
     }
 

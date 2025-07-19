@@ -5,9 +5,9 @@ namespace Model;
 
 public partial class Szigetele
 {
-    public int Azonosító { get; set; }
+    public int Id { get; set; }
 
-    public string? Mező1 { get; set; }
+    public string? Megnevezes { get; set; }
 
     public string? Szigeteles { get; set; }
 
@@ -32,4 +32,6 @@ public partial class Szigetele
     public byte[] SsmaTimeStamp { get; set; } = null!;
 
     public virtual Alvallalkozok? Alvallalkozo { get; set; }
+
+    public virtual Projektek? ProjektSzamNavigation { get; set; }
 }
